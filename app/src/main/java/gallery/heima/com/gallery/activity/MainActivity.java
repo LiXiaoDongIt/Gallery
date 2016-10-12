@@ -3,13 +3,9 @@ package gallery.heima.com.gallery.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -20,6 +16,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import gallery.heima.com.gallery.R;
+import gallery.heima.com.gallery.activity.adapter.MainAdapter;
 import network.GalleryHomeBean;
 import network.NetworkManager;
 import network.SexyGirlRequest;
@@ -28,8 +25,8 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.main_listview)
     ListView mListView;
-
     private List<GalleryHomeBean.TngouBean> mData;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onResponse(GalleryHomeBean response) {
             mData = response.getTngou();
-            mListView.setAdapter(mBaseAdapter);
+            mListView.setAdapter(new MainAdapter(MainActivity.this, mData));
             mListView.setOnItemClickListener(mOnItemClickListener);
         }
     };
@@ -79,49 +76,5 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private BaseAdapter mBaseAdapter = new BaseAdapter() {
-        @Override
-        public int getCount() {
-            if (mData == null) {
-                return 0;
-            }
-            return mData.size();
-        }
 
-        @Override
-        public GalleryHomeBean.TngouBean getItem(int position) {
-            return mData.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-            if (convertView == null) {
-                convertView = LayoutInflater.from(MainActivity.this).inflate(R.layout.list_item_gallery_home, null);
-                holder = new ViewHolder(convertView);
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            GalleryHomeBean.TngouBean bean = getItem(position);
-            holder.mTextView.setText(bean.getTitle());
-            return convertView;
-        }
-    };
-
-    class ViewHolder {
-
-        @BindView(R.id.home_tv_title)
-        TextView mTextView;
-
-        public ViewHolder(View root) {
-            ButterKnife.bind(this, root);
-        }
-    }
 }

@@ -3,26 +3,20 @@ package gallery.heima.com.gallery.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.bumptech.glide.Glide;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import gallery.heima.com.gallery.R;
-import jp.wasabeef.glide.transformations.CropCircleTransformation;
+import gallery.heima.com.gallery.activity.adapter.GalleryAdapter;
 import network.GalleryBean;
 import network.NetworkManager;
 import network.SexyGirlRequest;
@@ -56,7 +50,7 @@ public class GalleryActivity extends AppCompatActivity {
         @Override
         public void onResponse(GalleryBean response) {
             mData = response.getTngou();
-            mListView.setAdapter(mBaseAdapter);
+            mListView.setAdapter(new GalleryAdapter(GalleryActivity.this,mData));
             mListView.setOnItemClickListener(mOnItemClickListener);
         }
     };
@@ -77,55 +71,4 @@ public class GalleryActivity extends AppCompatActivity {
             Toast.makeText(GalleryActivity.this, "网络错误", Toast.LENGTH_LONG).show();
         }
     };
-
-    private BaseAdapter mBaseAdapter = new BaseAdapter() {
-        @Override
-        public int getCount() {
-            if (mData == null) {
-                return 0;
-            }
-            return mData.size();
-        }
-
-        @Override
-        public GalleryBean.TngouBean getItem(int position) {
-            return mData.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-            if (convertView == null) {
-                convertView = LayoutInflater.from(GalleryActivity.this).inflate(R.layout.list_item_gallery, null);
-                holder = new ViewHolder(convertView);
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            GalleryBean.TngouBean bean = getItem(position);
-            holder.mDes.setText(bean.getTitle());
-
-            String imageUrl = "http://tnfs.tngou.net/image" + bean.getImg();
-            Glide.with(GalleryActivity.this).load(imageUrl).bitmapTransform(new CropCircleTransformation(GalleryActivity.this)).into(holder.mIcon);
-
-            return convertView;
-        }
-    };
-
-    class ViewHolder {
-        @BindView(R.id.tv_des)
-        TextView mDes;
-        @BindView(R.id.iv_icon)
-        ImageView mIcon;
-
-        public ViewHolder(View root) {
-            ButterKnife.bind(this, root);
-        }
-    }
 }
